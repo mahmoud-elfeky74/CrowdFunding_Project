@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static%}
+{% block title %}{{obj.name}}{% endblock title %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/search.css'%}">
+<link rel="stylesheet" href="{% static 'css/card_style.css' %}">
+{% endblock styles %}
+
+{% block content %}
+<div class="search-section text-center py-5">
+    <div class="d-flex justify-content-center">
+        <div class="input-group w-50">
+            <select id="search-method" class="form-select border-0 rounded-start-pill shadow-sm search-select">
+                <option value="search_titles">Project</option>
+                <option value="search_categories">Category</option>
+                <option value="search_tags">Tag</option>
+            </select>
+            <input id="search-input" type="text" class="form-control border-0 shadow-sm" placeholder="search for a project">
+            <button id="search-btn" class="btn  rounded-end-pill shadow-sm">
+                <img src="{% static 'imgs/magnifiying-glass_93642.png' %}" alt="" width="20px" height="20px">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <h3 class="mt-4 fw-bold">{{ obj.name }}</h3>
+    <small>Viewing {{obj.projects_count}} project(s)</small>
+</div>
+<section class="custom-center">
+    <div class="container my-5">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for p in obj.projects.all %}
+            {% include 'partials/_project_card.html' with project=p %}
+            {% empty %}
+            <p class="text-center">No projects available.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+{% endblock content%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#search-btn').click(function () {
+            const searchBy = $('#search-method').val().trim()
+            const query = $('#search-input').val().trim();
+
+            const anchor = document.createElement("a")
+
+            if (query !== '') {
+                anchor.href = `{% url 'projects' %}?${searchBy}=${encodeURIComponent(query)}`;
+                anchor.click();
+            }
+        });
+
+        $('#search-input').on('keypress', function (e) {
+            if (e.which === 13) {
+                $('#search-btn').click();
+            }
+        });
+    });
+</script>
+{% endblock scripts %}
